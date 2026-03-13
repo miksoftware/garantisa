@@ -9,7 +9,17 @@
 </head>
 <body>
 <div class="container">
-    <h1>⚡ Automatización de Gestión - Garantisa</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 style="margin-bottom:0;">⚡ Automatización de Gestión - Garantisa</h1>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <span style="color:#64748b;font-size:0.85rem;">{{ Auth::user()->name }}</span>
+            <a href="/usuarios" class="btn" style="text-decoration:none;font-size:0.85rem;padding:8px 16px;background:#475569;">👥 Usuarios</a>
+            <form method="POST" action="/logout" style="margin:0;">
+                @csrf
+                <button type="submit" class="btn" style="background:#dc2626;font-size:0.85rem;padding:8px 16px;">Salir</button>
+            </form>
+        </div>
+    </div>
 
     <div class="card" id="uploadCard">
         <h2>📁 Subir archivo Excel</h2>
