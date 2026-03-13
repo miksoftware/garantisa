@@ -145,17 +145,52 @@ class GarantisaScraper
             $this->logger->response($status, $html, $this->flattenHeaders($response->getHeaders()));
             $this->logCookies();
 
+            // Buscar mensajes de error visibles en la respuesta
+            $errorMessages = [];
+            // Buscar labels de error ASP.NET
+            if (preg_match_all('/<span[^>]*class="[^"]*error[^"]*"[^>]*>(.*?)<\/span>/is', $html, $m)) {
+                $errorMessages = array_merge($errorMessages, array_filter(array_map('strip_tags', $m[1])));
+            }
+            // Buscar alertas JavaScript
+            if (preg_match_all('/alert\(["\']([^"\']+)["\']\)/i', $html, $m)) {
+                $errorMessages = array_merge($errorMessages, $m[1]);
+            }
+            // Buscar Radalert / Telerik notifications
+            if (preg_match_all('/radalert\(["\']([^"\']+)["\']/i', $html, $m)) {
+                $errorMessages = array_merge($errorMessages, $m[1]);
+            }
+            // Buscar divs con display:inline o visible que contengan texto de error
+            if (preg_match_all('/<(?:span|div|label)[^>]*(?:color\s*:\s*red|class="[^"]*(?:error|warning|mensaje)[^"]*")[^>]*>(.*?)<\/(?:span|div|label)>/is', $html, $m)) {
+                $errorMessages = array_merge($errorMessages, array_filter(array_map('strip_tags', $m[1])));
+            }
+            // Buscar contenido de Notificacion (RadNotification)
+            if (preg_match('/Notificacion.*?content["\s:]+["\']([^"\']+)["\']/is', $html, $m)) {
+                $errorMessages[] = $m[1];
+            }
+
+            if (!empty($errorMessages)) {
+                $this->logger->step('LOGIN', 'MENSAJES DE ERROR ENCONTRADOS: ' . json_encode($errorMessages, JSON_UNESCAPED_UNICODE));
+            }
+
+            // Guardar más del body para debug (últimos 3000 chars donde suelen estar los scripts)
+            $bodyEnd = substr($html, -3000);
+            $this->logger->step('LOGIN', 'FINAL DEL HTML (últimos 3000 chars): ' . $bodyEnd);
+
             // Verificar login exitoso: la respuesta NO debe contener txtUsr/btnLogin
             $indicators = [
                 'btnLogin (aún en login)' => str_contains($html, 'name="btnLogin"'),
                 'txtUsr (aún en login)'   => str_contains($html, 'name="txtUsr"'),
-                'error/alerta visible'    => (bool) preg_match('/alert\(["\'].*error/i', $html),
+                'error/alerta visible'    => !empty($errorMessages),
             ];
 
             $this->logger->step('LOGIN', 'Indicadores: ' . json_encode($indicators));
 
             if ($indicators['btnLogin (aún en login)'] || $indicators['txtUsr (aún en login)']) {
+                // Guardar HTML completo de la respuesta fallida para debug
+                $debugFile = storage_path('logs/debug_login_fallido_' . time() . '.html');
+                file_put_contents($debugFile, $html);
                 $this->logger->step('LOGIN', '✗ LOGIN FALLIDO - formulario de login sigue presente');
+                $this->logger->step('LOGIN', 'HTML completo guardado en: ' . basename($debugFile));
                 return false;
             }
 
