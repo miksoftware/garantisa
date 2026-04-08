@@ -62,7 +62,7 @@
     </div>
 
     <!-- Modal detalle batch -->
-    <div class="modal-overlay hidden" id="batchModal">
+    <div class="modal-overlay" id="batchModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Detalle de Ejecución</h2>

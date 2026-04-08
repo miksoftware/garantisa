@@ -283,7 +283,7 @@ async function viewBatch(batchId, total, success, failed, pending) {
     const modalActions = document.getElementById('modalActions');
     const modalDetail = document.getElementById('modalDetail');
 
-    modal.classList.remove('hidden');
+    modal.classList.add('active');
 
     // Stats cards
     modalStats.innerHTML = `
@@ -336,13 +336,14 @@ async function viewBatch(batchId, total, success, failed, pending) {
 }
 
 function closeModal() {
-    document.getElementById('batchModal').classList.add('hidden');
+    document.getElementById('batchModal').classList.remove('active');
 }
 
 // Cerrar modal con Escape o click fuera
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-document.getElementById('batchModal')?.addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
+document.addEventListener('click', e => {
+    const modal = document.getElementById('batchModal');
+    if (e.target === modal) closeModal();
 });
 
 // ==================== REINTENTAR FALLIDOS ====================
