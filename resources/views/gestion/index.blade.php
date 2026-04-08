@@ -54,14 +54,24 @@
     </div>
 
     <div class="card" id="logsHistoryCard">
-        <h2>🗂️ Historial de Logs de Debug</h2>
-        <p style="color:#94a3b8;font-size:0.85rem;margin-bottom:10px;">
-            Cada ejecución genera un archivo .log detallado con peticiones, respuestas, tokens y errores.
-            Compártelo para debuggear problemas.
-        </p>
-        <div id="logsHistoryList" style="font-family:Consolas,monospace;font-size:0.85rem;">Cargando...</div>
+        <h2>📊 Historial de Ejecuciones</h2>
+        <div id="batchesTable">Cargando...</div>
         <div class="actions" style="margin-top:10px;">
-            <button class="btn" onclick="loadLogs()" style="font-size:0.85rem;padding:8px 16px;">Refrescar</button>
+            <button class="btn" onclick="loadBatches()" style="font-size:0.85rem;padding:8px 16px;">Refrescar</button>
+        </div>
+    </div>
+
+    <!-- Modal detalle batch -->
+    <div class="modal-overlay hidden" id="batchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Detalle de Ejecución</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalStats" class="stats" style="margin-bottom:15px;"></div>
+            <div class="donut-wrapper" id="modalDonut"></div>
+            <div id="modalActions" style="text-align:center;margin:15px 0;"></div>
+            <div id="modalDetail" style="max-height:350px;overflow-y:auto;"></div>
         </div>
     </div>
 </div>

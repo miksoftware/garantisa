@@ -249,4 +249,63 @@ class GestionController extends Controller
             'Content-Type' => 'text/plain; charset=utf-8',
         ]);
     }
+
+    /**
+     * Listar historial de batches con resumen
+     */
+    public function batches()
+    {
+        $batches = GestionLog::selectRaw("
+                batch_id,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as processing,
+                MIN(created_at) as started_at,
+                MAX(updated_at) as finished_at
+            ")
+            ->groupBy('batch_id')
+            ->orderByDesc('started_at')
+            ->get();
+
+        return response()->json($batches);
+    }
+
+    /**
+     * Detalle de un batch específico (registros fallidos)
+     */
+    public function batchDetail(string $batchId)
+    {
+        $logs = GestionLog::where('batch_id', $batchId)
+            ->orderByRaw("CASE status WHEN 'failed' THEN 1 WHEN 'pending' THEN 2 WHEN 'processing' THEN 3 WHEN 'success' THEN 4 END")
+            ->get(['id', 'cedula', 'accion', 'resultado', 'comentario', 'status', 'error_message', 'updated_at']);
+
+        return response()->json($logs);
+    }
+
+    /**
+     * Reintentar registros fallidos de un batch
+     */
+    public function retryFailed(string $batchId)
+    {
+        $failedCount = GestionLog::where('batch_id', $batchId)
+            ->where('status', 'failed')
+            ->count();
+
+        if ($failedCount === 0) {
+            return response()->json(['error' => 'No hay registros fallidos para reintentar'], 422);
+        }
+
+        // Resetear fallidos a pending
+        GestionLog::where('batch_id', $batchId)
+            ->where('status', 'failed')
+            ->update(['status' => 'pending', 'error_message' => null]);
+
+        return response()->json([
+            'batch_id' => $batchId,
+            'total'    => $failedCount,
+            'message'  => "{$failedCount} registros fallidos puestos en cola para reintento",
+        ]);
+    }
 }

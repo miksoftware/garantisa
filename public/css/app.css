@@ -30,3 +30,50 @@ h1 { text-align: center; margin-bottom: 30px; color: #38bdf8; font-size: 1.6rem;
 .stat.failed .number { color: #f87171; }
 .hidden { display: none; }
 .actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+
+
+/* Tabla de batches */
+.batch-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.batch-table th { text-align: left; color: #94a3b8; font-weight: 600; padding: 10px 8px; border-bottom: 2px solid #334155; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.batch-table td { padding: 10px 8px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+.batch-table tr:hover { background: #1e293b80; }
+.batch-table .mini-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: #334155; min-width: 100px; }
+.batch-table .mini-bar .bar-success { background: #4ade80; }
+.batch-table .mini-bar .bar-failed { background: #f87171; }
+.batch-table .mini-bar .bar-pending { background: #fbbf24; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+.badge-complete { background: #065f46; color: #4ade80; }
+.badge-partial { background: #713f12; color: #fbbf24; }
+.badge-running { background: #1e3a5f; color: #60a5fa; }
+.btn-sm { font-size: 0.78rem; padding: 6px 14px; border-radius: 6px; cursor: pointer; border: none; color: white; transition: all 0.3s; }
+.btn-view { background: #475569; }
+.btn-view:hover { background: #64748b; }
+.btn-retry { background: #dc2626; }
+.btn-retry:hover { background: #b91c1c; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 30px; width: 95%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h2 { color: #38bdf8; font-size: 1.1rem; margin: 0; }
+.modal-close { background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+.modal-close:hover { color: #e2e8f0; }
+
+/* Donut chart */
+.donut-wrapper { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 15px 0; }
+.donut-chart { position: relative; width: 150px; height: 150px; }
+.donut-chart svg { width: 150px; height: 150px; transform: rotate(-90deg); }
+.donut-chart .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.donut-chart .donut-center .donut-number { font-size: 1.6rem; font-weight: 700; color: #e2e8f0; }
+.donut-chart .donut-center .donut-label { font-size: 0.7rem; color: #94a3b8; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+.donut-legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+/* Detail table in modal */
+.detail-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.detail-table th { text-align: left; color: #94a3b8; padding: 8px 6px; border-bottom: 2px solid #334155; font-size: 0.7rem; text-transform: uppercase; }
+.detail-table td { padding: 8px 6px; border-bottom: 1px solid #0f172a; }
+.detail-table .status-success { color: #4ade80; }
+.detail-table .status-failed { color: #f87171; }
+.detail-table .status-pending { color: #fbbf24; }

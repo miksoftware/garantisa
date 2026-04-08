@@ -18,6 +18,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/status/{batchId}', [GestionController::class, 'status']);
     Route::get('/logs', [GestionController::class, 'listLogs']);
     Route::get('/logs/{filename}', [GestionController::class, 'viewLog']);
+    Route::get('/batches', [GestionController::class, 'batches']);
+    Route::get('/batches/{batchId}', [GestionController::class, 'batchDetail']);
+    Route::post('/batches/{batchId}/retry', [GestionController::class, 'retryFailed']);
 
     // Usuarios
     Route::get('/usuarios', [UserController::class, 'index']);
