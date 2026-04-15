@@ -212,6 +212,7 @@ async function loadBatches() {
                 <td>
                     <button class="btn-sm btn-view" onclick="viewBatch('${b.batch_id}', ${b.total}, ${b.success}, ${b.failed}, ${b.pending + b.processing})">Ver</button>
                     ${b.failed > 0 ? `<button class="btn-sm btn-retry" onclick="retryBatch('${b.batch_id}')">🔄 Reintentar (${b.failed})</button>` : ''}
+                    ${(b.pending + b.processing) > 0 ? `<button class="btn-sm btn-continue" onclick="continueBatch('${b.batch_id}')">▶ Continuar (${b.pending + b.processing})</button>` : ''}
                 </td>
             </tr>`;
         });
@@ -299,8 +300,18 @@ async function viewBatch(batchId, total, success, failed, pending) {
     // Retry button
     if (failed > 0) {
         modalActions.innerHTML = `<button class="btn btn-retry" style="font-size:0.9rem;" onclick="retryBatch('${batchId}')">🔄 Reintentar ${failed} Fallidos</button>`;
+    } else if (pending > 0) {
+        modalActions.innerHTML = `<button class="btn btn-continue" style="font-size:0.9rem;" onclick="continueBatch('${batchId}')">▶ Continuar ${pending} Pendientes</button>`;
     } else {
         modalActions.innerHTML = '<p style="color:#4ade80;font-size:0.9rem;">✓ Todos los registros procesados correctamente</p>';
+    }
+
+    // Show both buttons if both failed and pending exist
+    if (failed > 0 && pending > 0) {
+        modalActions.innerHTML = `
+            <button class="btn btn-retry" style="font-size:0.9rem;margin-right:0.5rem;" onclick="retryBatch('${batchId}')">🔄 Reintentar ${failed} Fallidos</button>
+            <button class="btn btn-continue" style="font-size:0.9rem;" onclick="continueBatch('${batchId}')">▶ Continuar ${pending} Pendientes</button>
+        `;
     }
 
     // Load detail table
@@ -347,6 +358,44 @@ document.addEventListener('click', e => {
 });
 
 // ==================== REINTENTAR FALLIDOS ====================
+
+async function continueBatch(batchId) {
+    if (!confirm('¿Continuar procesando los registros pendientes de este batch?')) return;
+
+    try {
+        const res = await fetch(`/batches/${batchId}/continue`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || 'Error al continuar');
+            return;
+        }
+
+        // Cerrar modal si está abierto
+        closeModal();
+
+        // Mostrar progreso
+        stats = { total: data.total, pending: data.total, success: 0, failed: 0 };
+        updateStats();
+        progressCard.classList.remove('hidden');
+        logCard.classList.remove('hidden');
+        logContainer.innerHTML = '';
+        progressFill.style.width = '0%';
+
+        addLog('info', `▶ ${data.message}`);
+
+        // Iniciar procesamiento SSE
+        startProcessing(batchId);
+    } catch (e) {
+        alert('Error de conexión: ' + e.message);
+    }
+}
 
 async function retryBatch(batchId) {
     if (!confirm('¿Reintentar todos los registros fallidos de este batch?')) return;

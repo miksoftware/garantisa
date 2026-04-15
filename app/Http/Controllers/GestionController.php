@@ -308,4 +308,29 @@ class GestionController extends Controller
             'message'  => "{$failedCount} registros fallidos puestos en cola para reintento",
         ]);
     }
+
+    /**
+     * Continuar procesando registros pendientes (y stuck en processing) de un batch
+     */
+    public function continueBatch(string $batchId)
+    {
+        // Resetear los que quedaron en 'processing' (stuck) a 'pending'
+        GestionLog::where('batch_id', $batchId)
+            ->where('status', 'processing')
+            ->update(['status' => 'pending']);
+
+        $pendingCount = GestionLog::where('batch_id', $batchId)
+            ->where('status', 'pending')
+            ->count();
+
+        if ($pendingCount === 0) {
+            return response()->json(['error' => 'No hay registros pendientes para continuar'], 422);
+        }
+
+        return response()->json([
+            'batch_id' => $batchId,
+            'total'    => $pendingCount,
+            'message'  => "{$pendingCount} registros pendientes listos para procesar",
+        ]);
+    }
 }

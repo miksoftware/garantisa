@@ -50,6 +50,8 @@ h1 { text-align: center; margin-bottom: 30px; color: #38bdf8; font-size: 1.6rem;
 .btn-view:hover { background: #64748b; }
 .btn-retry { background: #dc2626; }
 .btn-retry:hover { background: #b91c1c; }
+.btn-continue { background: #2563eb; }
+.btn-continue:hover { background: #1d4ed8; }
 
 /* Modal */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; display: none; }
