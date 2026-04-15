@@ -194,7 +194,7 @@ async function loadBatches() {
                 badge = '<span class="badge badge-complete">Completado</span>';
             }
 
-            const date = new Date(b.started_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+            const date = new Date(b.started_at).toLocaleDateString('es-CO', { dateStyle: 'short' });
 
             html += `<tr>
                 <td>${date}</td>
